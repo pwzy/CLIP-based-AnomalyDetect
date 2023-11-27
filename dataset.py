@@ -379,6 +379,81 @@ class VideoFrameDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.video_list)
 
+def train_dataloader():  
+    train_data_normal = VideoFrameDataset(
+        root_path= '/home/jing/project/dataset/Vit-B-16/UCFCrime/Image-Features/',
+        annotationfile_path='/home/jing/project/dataset/Vit-B-16/UCFCrime/Annotations/Anomaly_Train_Normal.txt',
+        normal_id= 7,
+        num_segments= 32,
+        frames_per_segment= 16,
+        imagefile_template= '{:06d}.jpg',
+        transform= None,
+        ncrops= 1,
+        stride= 1,
+    )
+
+    train_data_anomaly = VideoFrameDataset(
+        root_path= '/home/jing/project/dataset/Vit-B-16/UCFCrime/Image-Features/',
+        annotationfile_path= '/home/jing/project/dataset/Vit-B-16/UCFCrime/Annotations/Anomaly_Train_Abnormal.txt',
+        normal_id= 7,
+        num_segments= 32,
+        frames_per_segment= 16,
+        imagefile_template= '{:06d}.jpg',
+        transform= None,  # None 
+        ncrops= 1,
+        stride= 1,
+        spatialannotationdir_path= None, # None 
+    )
+
+    train_loader_normal = DataLoader(
+        dataset= train_data_normal,
+        batch_size= 64 // 2,
+        num_workers= 10 // 2,
+        pin_memory= False,
+        shuffle=True,
+        drop_last=True,
+    )
+
+    train_loader_abnormal = DataLoader(
+        dataset= train_data_anomaly,
+        batch_size= 64// 2,
+        num_workers= 10 // 2,
+        pin_memory=False,
+        shuffle=True,
+        drop_last=True,
+    )
+
+    return [train_loader_normal, train_loader_abnormal]  
+
+
+def test_dataloader():  
+    test_data = VideoFrameDataset(
+        root_path= '/home/jing/project/dataset/Vit-B-16/UCFCrime/Image-Features/',
+        annotationfile_path= '/home/jing/project/dataset/Vit-B-16/UCFCrime/Annotations/Anomaly_Test.txt',
+        normal_id= 7,
+        num_segments= 32,
+        frames_per_segment= 16,
+        imagefile_template= '{:06d}.jpg',
+        transform= None, 
+        test_mode= True,
+        ncrops= 1,
+        temporal_annotation_file= '/home/jing/project/dataset/Vit-B-16/UCFCrime/Temporal_Anomaly_Annotation_for_Testing_Videos.txt',
+        labels_file= '/home/jing/project/AnomalyCLIP/data/ucf_labels.csv',
+        stride= 1,
+    )
+
+    test_dataloader = DataLoader(
+        dataset= test_data,
+        batch_size= 1,
+        num_workers= 10 // 2,
+        pin_memory= False,
+        shuffle=False,
+        drop_last=False,
+    )
+
+    return test_dataloader
+
+
 
 if __name__ == '__main__':
     
@@ -469,3 +544,4 @@ if __name__ == '__main__':
     # print(len(train_data_normal))
 
     print('success!')
+
