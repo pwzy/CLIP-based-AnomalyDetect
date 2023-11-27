@@ -379,6 +379,9 @@ class VideoFrameDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.video_list)
 
+# 返回[train_loader_normal, train_loader_abnormal]  train_loader_normal的情况如下：
+# print(next(iter(train_dataloader[0]))[0].shape) # torch.Size([32, 1, 512, 512])
+# print(next(iter(train_dataloader[0]))[1].shape) # torch.Size([32])
 def train_dataloader():  
     train_data_normal = VideoFrameDataset(
         root_path= '/home/jing/project/dataset/Vit-B-16/UCFCrime/Image-Features/',
@@ -425,7 +428,11 @@ def train_dataloader():
 
     return [train_loader_normal, train_loader_abnormal]  
 
-
+# 返回 features, labels, label, segment_size
+# print(next(iter(test_dataloader))[0].shape) # torch.Size([1, 1, 1536, 512]) # torch.Size([1, 1536, 512])  代表 [ batch，长度（包括扩展后的长度）, dimension ]  扩展长度=（（原长度）// 512）+ 1）* 512
+# print(next(iter(test_dataloader))[1].shape) # torch.Size([1, 1412]) # (1412,) 每帧的标签：[7,7,...,0,0,0,...,7,7,7] 
+# print(next(iter(test_dataloader))[2].shape) # torch.Size([1]) # 0 视频级别的标签
+# print(next(iter(test_dataloader))[3].shape) # torch.Size([1]) # 视频长度为512的倍数
 def test_dataloader():  
     test_data = VideoFrameDataset(
         root_path= '/home/jing/project/dataset/Vit-B-16/UCFCrime/Image-Features/',
